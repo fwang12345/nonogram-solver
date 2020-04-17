@@ -65,7 +65,7 @@ def draw_nonogram(size):
                 number = FONT.render(str(num), True, BLACK)
 
                 x = OFFSET + DATA + BLK / 2 + i * BLK
-                y = OFFSET + DATA - BLK / 2 - j * BLK / 2.5
+                y = OFFSET + DATA - BLK / 2 - j * BLK / 2.4
 
                 position = number.get_rect(center=(x, y))
 
