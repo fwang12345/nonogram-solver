@@ -2,7 +2,7 @@ import cv2
 from pytesseract import image_to_string, pytesseract
 # Process image and return processed image along with bounding rectanges of rows and columns digits
 def preprocess(fname):
-    pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    # pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     ref = cv2.imread(fname)
     # Convert to black and white
     ref = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
