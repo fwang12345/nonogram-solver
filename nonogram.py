@@ -1,9 +1,8 @@
 from pygame import *
-# from easy import puzzle, rows, cols, N, SEC
-# from medium import puzzle, rows, cols, N, SEC
-# from hard import puzzle, rows, cols, N, SEC
+from pygame_gui import *
 from solver import read, solve
 from parse import preprocess, get_patterns
+
 BLACK = (0, 0, 0)
 BLUE = (21, 34, 110)
 LIGHT_BLUE = (212, 224, 248)
@@ -11,6 +10,17 @@ WHITE = (255, 255, 255)
 fname = 'images/test4.png'
 
 def draw_nonogram(size):
+    SCREEN = size                                               # size of screen
+    OFFSET = SCREEN / 10                                        # offset, think border
+    FONT_SIZE = int(OFFSET / 5)                                 # font size
+    init()
+    screen = display.set_mode((SCREEN, SCREEN))
+    manager = UIManager((SCREEN, SCREEN))
+    display.set_caption('Nongram Solver')
+    FONT = font.SysFont('comicsansms', FONT_SIZE)
+
+    hello_button = elements.UIButton(relative_rect=pygame.Rect((350, 275), (100, 50)), text='Say Hello', manager=manager)
+
     # Get contours for image
     ref, row_cnts, col_cnts = preprocess(fname)
     # Get patterns from contours
@@ -24,18 +34,10 @@ def draw_nonogram(size):
     for i in cols:
         print(i)
     puzzle = solve(N, rows, cols)
-    
-    SCREEN = size                                               # size of screen
-    OFFSET = SCREEN / 10                                        # offset, think border
-    FONT_SIZE = int(OFFSET / 5)                                 # font size
+
     SLICE = 2 if N < 10 else 1.5                                # proportional size of the data blocks
     BLK = (SCREEN - 2 * OFFSET) / (N * (SEC + 1 / SLICE) / SEC) # size of one block
     DATA = N / SLICE / SEC * BLK                                # size of where the given data is
-
-    init()
-    screen = display.set_mode((SCREEN, SCREEN))
-    display.set_caption('Nongram')
-    FONT = font.SysFont('comicsansms', FONT_SIZE)
 
     while True:
 
