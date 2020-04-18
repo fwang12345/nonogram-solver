@@ -210,11 +210,12 @@ def solve(size, rows, cols):
     clauses += pattern_atleast_one(size, rows, cols, rows_range, cols_range, rows_id, cols_id)
     clauses += pattern_atmost_one(size, rows, cols, rows_range, cols_range, rows_id, cols_id)
     literals = pycosat.solve(clauses)
+    solved_grid = [[0] * size for _ in range(size)]
     if (literals == 'UNSAT'):
-        raise ValueError('Impossible Nonogram puzzle!')
+        print('Impossible puzzle')
+        return solved_grid
     print(f'Solved the {size}x{size} Nonogram puzzle in {timer()-t} seconds!')
     num = size * size
-    solved_grid = [[0] * size for _ in range(size)]
     for i in literals:
         if (i > 0 and i <= num):
             row, col = grid(size, i)

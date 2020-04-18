@@ -3,15 +3,26 @@ from pygame import *
 # from medium import puzzle, rows, cols, N, SEC
 # from hard import puzzle, rows, cols, N, SEC
 from solver import read, solve
+from parse import preprocess, get_patterns
 BLACK = (0, 0, 0)
 BLUE = (21, 34, 110)
 LIGHT_BLUE = (212, 224, 248)
 WHITE = (255, 255, 255)
-fname = 'puzzles/eiffel.txt'
+fname = 'images/test4.png'
 
 def draw_nonogram(size):
-    N, rows, cols = read(fname)
+    # Get contours for image
+    ref, row_cnts, col_cnts = preprocess(fname)
+    # Get patterns from contours
+    N, rows, cols = get_patterns(ref, row_cnts, col_cnts)
     SEC = N // 5
+    print('Loaded %d x %d puzzle' %(N, N))
+    print('Rows')
+    for i in rows:
+        print(i)
+    print('Columns')
+    for i in cols:
+        print(i)
     puzzle = solve(N, rows, cols)
     
     SCREEN = size                                               # size of screen
