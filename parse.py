@@ -2,7 +2,7 @@ import cv2
 from pytesseract import image_to_string, pytesseract
 # Process image and return processed image along with bounding rectanges of rows and columns digits
 def preprocess(fname):
-    # pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     ref = cv2.imread(fname)
     # Convert to black and white
     ref = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)
@@ -73,7 +73,7 @@ def get_patterns(ref, rows, cols):
                 box = cv2.threshold(box, thres, 255, cv2.THRESH_BINARY)[1]
                 while (border < 10 and len(digit) == 0):
                     box = cv2.copyMakeBorder(box, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value = (255, 255, 255))
-                    #cv2.imwrite(r'digits\row%d-%d-%d.png' %(i, j, k), box)
+                    cv2.imwrite(r'digits\row%d-%d-%d.png' %(i, j, k), box)
                     digit = image_to_string(box, config="--psm 13 -c tessedit_char_whitelist=0123456789")
                     border += 1
                 #print("Number (border=%d) at row %d group %d digit %d is %s" %(border-1, i, j, k, digit))
@@ -92,12 +92,12 @@ def get_patterns(ref, rows, cols):
                 border = 1
                 while (border < 10 and len(number) == 0):
                     box = cv2.copyMakeBorder(box, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value = (255, 255, 255)) 
-                    #cv2.imwrite(r'digits\row%d-%d.png' %(i, j), box)
+                    cv2.imwrite(r'digits\row%d-%d.png' %(i, j), box)
                     number = image_to_string(box, config="--psm 13 -c tessedit_char_whitelist=0123456789")
                     border += 1
             #print("Number (border=%d) at row %d group %d is %s" %(border-1, i, j, number))
             digits.append(int(number))
-            
+        print("Row %d: " %(i+1), digits)
         row_digits.append(digits)
     #print('Columns')
     space = max([cols[i][0] - cols[i-1][0] - cols[i-1][2] for i in range(1, len(cols))])
@@ -137,7 +137,7 @@ def get_patterns(ref, rows, cols):
                 box = cv2.threshold(box, thres, 255, cv2.THRESH_BINARY)[1]
                 while (border < 10 and len(digit) == 0):
                     box = cv2.copyMakeBorder(box, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value = (255, 255, 255))
-                    #cv2.imwrite(r'digits\col%d-%d-%d.png' %(i, j, k), box)
+                    cv2.imwrite(r'digits\col%d-%d-%d.png' %(i, j, k), box)
                     digit = image_to_string(box, config="--psm 13 -c tessedit_char_whitelist=0123456789")
                     border += 1
                 #print("Number (border=%d) at col %d group %d digit %d is %s" %(border-1, i, j, k, digit))
@@ -156,11 +156,12 @@ def get_patterns(ref, rows, cols):
                 border = 1
                 while (border < 10 and len(number) == 0):
                     box = cv2.copyMakeBorder(box, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value = (255, 255, 255)) 
-                    #cv2.imwrite(r'digits\col%d-%d.png' %(i, j), box)
+                    cv2.imwrite(r'digits\col%d-%d.png' %(i, j), box)
                     number = image_to_string(box, config="--psm 13 -c tessedit_char_whitelist=0123456789")
                     border += 1
             #print("Number (border=%d) at col %d group %d is %s" %(border-1, i, j, number))
             digits.append(int(number))
+        print("Column %d: " %(i+1), digits)
         col_digits.append(digits)
     if (len(row_digits) != len(col_digits)):
         for i in row_digits:

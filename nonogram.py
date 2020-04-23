@@ -1,6 +1,6 @@
 from pygame import *
-# from tkinter import Tk
-# from tkinter.filedialog import askopenfilename
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 from solver import read, solve
 from parse import preprocess, get_patterns
 
@@ -9,25 +9,18 @@ BLUE = (21, 34, 110)
 LIGHT_BLUE = (212, 224, 248)
 RED = (255, 0, 0)
 WHITE = (255, 255, 255)
-fname = 'images/test4.png'
+SCREEN = 800                                                # size of screen
+OFFSET = SCREEN / 7.5                                       # offset, think border
+FONT_SIZE = int(OFFSET / 5.5)                               # font size
+fname = 'images/10g_1.png'
 
-def draw_nonogram(size):
-    SCREEN = size                                               # size of screen
-    OFFSET = SCREEN / 7.5                                       # offset, think border
-    FONT_SIZE = int(OFFSET / 5)                                 # font size
-
-    # initial pygame data
-    init()
-    screen = display.set_mode((SCREEN, SCREEN))
-    display.set_caption('Nongram Solver')
-    FONT = font.SysFont('comicsansms', FONT_SIZE)
-
+def draw_nonogram():
     ref, row_cnts, col_cnts = 0, 0, 0
     N, rows, cols = 0, [], []
     puzzle = []
 
     title_pos = (SCREEN / 2, SCREEN / 4)
-    button_offset = (SCREEN / (5 * 2), SCREEN / (10 * 2))
+    button_offset = (SCREEN / (7.5), SCREEN / (10 * 2))
 
     # x and y is the center of the button
     x, y = SCREEN / 2, SCREEN / 2
@@ -35,23 +28,27 @@ def draw_nonogram(size):
     font_pos =  (x, y)
 
     # draw title screen
-    choosing = True
-    while choosing:
+    loop = True
+    while loop:
         for e in event.get():
             if e.type == QUIT:
                 quit()
+                return False
             elif e.type == MOUSEBUTTONDOWN:
                 x_bounds = e.pos[0] > button_pos[0] and e.pos[0] < button_pos[0] + button_pos[2]
                 y_bounds = e.pos[1] > button_pos[1] and e.pos[1] < button_pos[1] + button_pos[3]
                 if (x_bounds and y_bounds and e.button == 1):
-                    print('choosing')
-                    # Tk().withdraw()
-                    # fname = askopenfilename() 
-                    ref, row_cnts, col_cnts = preprocess(fname)
-
-                    print('loading')
-                    N, rows, cols = get_patterns(ref, row_cnts, col_cnts)
-                    choosing = False
+                    Tk().withdraw()
+                    fname = askopenfilename()
+                    print('Loading %s' %(fname))
+                    try:
+                        ref, row_cnts, col_cnts = preprocess(fname)
+                        print('Loading pattern data')
+                        N, rows, cols = get_patterns(ref, row_cnts, col_cnts)
+                    except:
+                        print('Non-image file detected')
+                        N, rows, cols = read(fname)      
+                    loop = False
 
         # draw background
         screen.fill(WHITE)
@@ -77,30 +74,36 @@ def draw_nonogram(size):
     font_pos = (x, y)
 
     # draw unsolved puzzle
-    not_solved = True
-    while not_solved:
+    loop = True
+    while loop:
         for e in event.get():
             if e.type == QUIT:
                 quit()
+                return False
             elif e.type == MOUSEBUTTONDOWN:
                 x_bounds = e.pos[0] > button_pos[0] and e.pos[0] < button_pos[0] + button_pos[2]
                 y_bounds = e.pos[1] > button_pos[1] and e.pos[1] < button_pos[1] + button_pos[3]
                 if (x_bounds and y_bounds and e.button == 1):
-                    print('begin solving')
+                    print('Solving puzzle')
                     puzzle = solve(N, rows, cols)
-                    not_solved = False
+                    loop = False
 
         draw_one(screen, SCREEN, N, SEC, OFFSET, DATA, BLK, FONT, FONT_SIZE, rows, cols)
         draw_button(screen, SCREEN, OFFSET, FONT_SIZE, button_pos, font_pos, 'Solve')
 
         display.update()
-
-    while True:
+    loop = True
+    while loop:
 
         for e in event.get():
             if e.type == QUIT:
                 quit()
-        
+                return False
+            elif e.type == MOUSEBUTTONDOWN:
+                    x_bounds = e.pos[0] > button_pos[0] and e.pos[0] < button_pos[0] + button_pos[2]
+                    y_bounds = e.pos[1] > button_pos[1] and e.pos[1] < button_pos[1] + button_pos[3]
+                    if (x_bounds and y_bounds and e.button == 1):
+                        loop = False
         draw_one(screen, SCREEN, N, SEC, OFFSET, DATA, BLK, FONT, FONT_SIZE, rows, cols)
 
         # fill in correct squares
@@ -110,8 +113,10 @@ def draw_nonogram(size):
                     x = OFFSET + DATA + i * BLK
                     y = OFFSET + DATA + j * BLK
                     draw.rect(screen, BLUE, (y , x, BLK + 1, BLK + 1))
-
+                    
+        draw_button(screen, SCREEN, OFFSET, FONT_SIZE, button_pos, font_pos, 'New Puzzle')
         display.update()
+    return True
 
 def draw_button(screen, SCREEN, OFFSET, FONT_SIZE, button_pos, font_pos, text):
     TITLE_FONT = font.SysFont('comicsansms', FONT_SIZE * 2)
@@ -150,7 +155,7 @@ def draw_one(screen, SCREEN, N, SEC, OFFSET, DATA, BLK, FONT, FONT_SIZE, rows, c
         for j, num in enumerate(row[::-1]):
             number = FONT.render(str(num), True, BLACK)
 
-            x = OFFSET + DATA - BLK / 2 - j * BLK / 3
+            x = OFFSET + DATA - BLK / 2 - j * BLK / 2
             y = OFFSET + DATA + BLK / 2 + i * BLK
 
             position = number.get_rect(center=(x, y))
@@ -163,7 +168,7 @@ def draw_one(screen, SCREEN, N, SEC, OFFSET, DATA, BLK, FONT, FONT_SIZE, rows, c
             number = FONT.render(str(num), True, BLACK)
 
             x = OFFSET + DATA + BLK / 2 + i * BLK
-            y = OFFSET + DATA - BLK / 2 - j * BLK / 2.4
+            y = OFFSET + DATA - BLK / 2 - j * BLK / 2
 
             position = number.get_rect(center=(x, y))
 
@@ -185,4 +190,11 @@ def draw_one(screen, SCREEN, N, SEC, OFFSET, DATA, BLK, FONT, FONT_SIZE, rows, c
         draw.lines(screen, BLACK, False, [(sta, inc), (end, inc)], thickness)
         draw.lines(screen, BLACK, False, [(inc, sta), (inc, end)], thickness)
 
-draw_nonogram(800)
+# initial pygame data
+init()
+screen = display.set_mode((SCREEN, SCREEN))
+display.set_caption('Nongram Solver')
+FONT = font.SysFont('comicsansms', FONT_SIZE)
+cont = True
+while cont:
+    cont = draw_nonogram()
