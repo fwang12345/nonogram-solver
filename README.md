@@ -25,7 +25,7 @@ solver.py: Parses pattern numbers from text file and solves puzzle pattern numbe
 
 images: Contains image inputs to solver
 
-puzles: Contains text inputs to solver
+puzzles: Contains text inputs to solver
 
 ## Dependencies
 
