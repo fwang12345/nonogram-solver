@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pycosat
-from timeit import default_timer as timer
 
 # Find row and column given index and size of grid
 def grid(size, index):
@@ -57,7 +56,7 @@ def read(fname):
     for line in l:
         for pat in line:
             if (pat <= 0 or pat > size):
-                raise Exception('Pattern out of bounds')
+                raise Exception('Pattern out of bounds at line: ' + str(line))
     return size, l[:size], l[size:]
 
 # Compute possible index range for all patterns
@@ -202,7 +201,6 @@ def pattern_atmost_one(size, rows, cols, rows_range, cols_range, rows_id, cols_i
 def solve(size, rows, cols):
     rows_range, cols_range = pattern_range(size, rows, cols)
     rows_id, cols_id = pattern_id(size, rows, cols)
-    t = timer()
     clauses = []
     clauses += pattern_shade(size, rows, cols, rows_range, cols_range, rows_id, cols_id)
     clauses += cell_shade(size, rows, cols, rows_range, cols_range, rows_id, cols_id)
@@ -214,7 +212,6 @@ def solve(size, rows, cols):
     if (literals == 'UNSAT'):
         print('Impossible puzzle')
         return solved_grid
-    print(f'Solved the {size}x{size} Nonogram puzzle in {timer()-t} seconds!')
     num = size * size
     for i in literals:
         if (i > 0 and i <= num):
